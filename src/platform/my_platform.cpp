@@ -172,7 +172,7 @@ namespace MyPlatform::Impl {
         if (Globals::drive == nullptr) {
             printf("ERROR: drive is nullptr\n");
         } else {
-            Globals::drive->setSpeed(0, 0, 0);
+            Globals::drive->brake();
             for (int i = 0; i < 4; ++i) {
                 Util::set_builtin_led(true);
                 sleep_ms(250);
