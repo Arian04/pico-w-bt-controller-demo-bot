@@ -44,18 +44,48 @@ namespace MyPlatform::Impl {
     static void handle_controller_data(uni_hid_device_t* device, const uni_controller_t* controller) {
         const uni_gamepad_t* gamepad = &controller->gamepad;
 
-        if ((gamepad->buttons & BUTTON_A)) {
-            play_dual_rumble(device,
-                             0, 250,
-                             128, 0);
+        // NOTE: just some testing code
+        constexpr bool ENABLE_TESTING_BUTTONS = true;
+        if constexpr (ENABLE_TESTING_BUTTONS) {
+            // Send rumble when clicking these buttons for the user to verify that controller data is being handled
+            if ((gamepad->buttons & BUTTON_A)) {
+                play_dual_rumble(device,
+                                 0, 250,
+                                 128, 0);
+            }
+            if ((gamepad->buttons & BUTTON_B)) {
+                play_dual_rumble(device, 0, 250,
+                                 0, 128);
+            }
+
+            if (Globals::drive == nullptr) {
+                printf("ERROR: drive is nullptr\n");
+            } else {
+                // Test individual motors using DPAD
+                // NOTE:
+                //  must return after setting the speed, otherwise the speed will just be overwritten by the joystick
+                //  state later in this function.
+                if (gamepad->dpad & DPAD_DOWN) {
+                    Globals::drive->backMotor()->setSpeed(300);
+                    return;
+                }
+                if (gamepad->dpad & DPAD_UP) {
+                    Globals::drive->frontMotor()->setSpeed(300);
+                    return;
+                }
+                if (gamepad->dpad & DPAD_LEFT) {
+                    Globals::drive->leftMotor()->setSpeed(300);
+                    return;
+                }
+                if (gamepad->dpad & DPAD_RIGHT) {
+                    Globals::drive->rightMotor()->setSpeed(300);
+                    return;
+                }
+            }
         }
 
-        if ((gamepad->buttons & BUTTON_B)) {
-            play_dual_rumble(device, 0, 250,
-                             0, 128);
-        }
-
-        // Triggers: Variable rumble
+        // Left trigger is the brake.
+        // Implemented variable trigger rumble just for fun, doesn't impact functionality :)
         if (gamepad->buttons & BUTTON_TRIGGER_L) {
             const uint32_t raw_val = gamepad->brake; // value is known to be in [0, 1023];
             const uint8_t val = raw_val / 4;
@@ -74,33 +104,25 @@ namespace MyPlatform::Impl {
                 return;
             }
         }
-        if (gamepad->buttons & BUTTON_TRIGGER_R) {
-            const uint32_t raw_val = gamepad->throttle; // value is known to be in [0, 1023];
-            const uint8_t val = raw_val / 4;
 
-            xboxone_play_quad_rumble(
-                device,
-                0, 50,
-                0, val,
-                0, 0
-            );
-        }
+        // These static_casts should safely do nothing other than suppress warnings, because the comments in
+        // uni_gamepad.h say that the gamepad axes should be in the range [-512, 511] anyway.
+        auto left_x = Util::constrain<int16_t, -500, 500>(static_cast<int16_t>(gamepad->axis_x));
+        auto left_y = Util::constrain<int16_t, -500, 500>(static_cast<int16_t>(gamepad->axis_y));
+        auto right_x = Util::constrain<int16_t, -500, 500>(static_cast<int16_t>(gamepad->axis_rx));
+        auto right_y = Util::constrain<int16_t, -500, 500>(static_cast<int16_t>(gamepad->axis_ry));
 
-        auto left_x = Util::constrain<int16_t, -500, 500>(gamepad->axis_x);
-        auto left_y = Util::constrain<int16_t, -500, 500>(gamepad->axis_y);
-        auto right_x = Util::constrain<int16_t, -500, 500>(gamepad->axis_rx);
-        auto right_y = Util::constrain<int16_t, -500, 500>(gamepad->axis_ry);
-
-        if (left_x < 50 && left_x > -50) {
+        constexpr uint16_t DEADZONE = 50;
+        if (std::abs(left_x) < DEADZONE) {
             left_x = 0;
         }
-        if (left_y < 50 && left_y > -50) {
+        if (std::abs(left_y) < DEADZONE) {
             left_y = 0;
         }
-        if (right_x < 50 && right_x > -50) {
+        if (std::abs(right_x) < DEADZONE) {
             right_x = 0;
         }
-        if (right_y < 50 && right_y > -50) {
+        if (std::abs(right_y) < DEADZONE) {
             right_y = 0;
         }
 

@@ -32,4 +32,20 @@ public:
         back->brake();
         right->brake();
     }
+
+    [[nodiscard]] Motor* frontMotor() const {
+        return front;
+    }
+
+    [[nodiscard]] Motor* leftMotor() const {
+        return left;
+    }
+
+    [[nodiscard]] Motor* backMotor() const {
+        return back;
+    }
+
+    [[nodiscard]] Motor* rightMotor() const {
+        return right;
+    }
 };
