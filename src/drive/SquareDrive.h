@@ -19,10 +19,10 @@ public:
      * @param rotation int in the range [-500, 500]
      */
     void setSpeed(const int16_t x, const int16_t y, const int16_t rotation) const {
-        left->setSpeed(y + rotation);
-        right->setSpeed(y - rotation);
-        front->setSpeed(x - rotation);
-        back->setSpeed(x + rotation);
+        left->setSpeed(y - rotation);
+        right->setSpeed(y + rotation);
+        front->setSpeed(x + rotation);
+        back->setSpeed(x - rotation);
         // back and front seem to be flipped when rotating...
     }
 

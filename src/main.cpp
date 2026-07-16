@@ -74,7 +74,7 @@ int main() {
     auto* motor_pin20 = new Motor{20, true};
     auto* motor_pin21 = new Motor{21, false};
 
-    test_all_motors(motor_pin18, motor_pin19, motor_pin20, motor_pin21);
+    // test_all_motors(motor_pin18, motor_pin19, motor_pin20, motor_pin21);
 
     auto* drive = new SquareDrive{motor_pin18, motor_pin19, motor_pin20, motor_pin21};
 
