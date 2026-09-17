@@ -69,14 +69,14 @@ int main() {
     }
 
     // Init motors
-    auto* motor_pin18 = new Motor{18, false};
-    auto* motor_pin19 = new Motor{19, true};
-    auto* motor_pin20 = new Motor{20, true};
-    auto* motor_pin21 = new Motor{21, false};
+    auto* motor_front = new Motor{18, false};
+    auto* motor_left = new Motor{19, true};
+    auto* motor_back = new Motor{20, true};
+    auto* motor_right = new Motor{21, false};
 
-    // test_all_motors(motor_pin18, motor_pin19, motor_pin20, motor_pin21);
+    // test_all_motors(motor_front, motor_left, motor_back, motor_right);
 
-    auto* drive = new SquareDrive{motor_pin18, motor_pin19, motor_pin20, motor_pin21};
+    auto* drive = new SquareDrive{motor_front, motor_left, motor_back, motor_right};
 
     Globals::drive = drive;
 
